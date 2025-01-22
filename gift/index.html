@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/tweenmax.min.js"></script>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/jquery.superscrollorama.js"></script>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/iscroll.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<body>
+
+    <section id="js-main" class="main">
+        <div class="box">
+            <div class="box__item box__item--base">
+                <div class="container" id="container">
+                    <div id="fire" class="txt">
+                        HAPPY NEW YEAR TO THE MOON
+                    </div>
+                    <canvas id="canvas"></canvas>
+                </div>
+
+            </div>
+            <div class="box__item box__item--left"></div>
+            <div class="box__item box__item--right"></div>
+            <div class="box__item box__item--top"></div>
+            <div class="box__item box__item--bottom">
+            </div>
+            <div class="box__item box__item--shadow"></div>
+        </div>
+        <!-- <div class="box-icon__content" style="width: 192px; height: 192px;">
+            <img
+                src="https://static-cse.canva.com/_next/static/media/color-paint.file.86dd4758.svg"
+                srcset="https://static-cse.canva.com/_next/static/media/color-paint.file.86dd4758.svg">
+        </div> -->
+        <div class="box-icon__shadow"></div>
+        </a>
+        <div id="js-cover-place" class="cover-place">
+            <div id="js-cover" class="cover">
+                <div class="cover__item cover__item--base">
+                    <div id="js-base-shadow" class="cover__item__shadow"></div>
+                </div>
+                <div class="cover__item cover__item--left"></div>
+                <div class="cover__item cover__item--bottom">
+                    <div id="js-bottom-shadow" class="cover__item__shadow"></div>
+                </div>
+            </div>
+        </div>
+        <div id="js-left-peel" class="peel-item peel-item--left">
+            <div class="peel-item__bg">
+                <div id="js-left-inner" class="peel-item__bg__inner"></div>
+            </div>
+            <div class="peel-item__white"></div>
+            <div class="peel-item__gradient"></div>
+        </div>
+        <div id="js-right-peel" class="peel-item peel-item--right">
+            <div class="peel-item__bg">
+                <div id="js-right-inner" class="peel-item__bg__inner"></div>
+            </div>
+            <div class="peel-item__white"></div>
+            <div class="peel-item__gradient"></div>
+        </div>
+        <div id="js-line1" class="line-item line-item--hor"></div>
+        <div id="js-line2" class="line-item line-item--vert">
+            <div class="bow">
+                <div class="bow__content"></div>
+                <div class="threads">
+                    <div class="thread-left">
+                        <div class="thread-left__content"></div>
+                    </div>
+                    <div class="thread-right">
+                        <div class="thread-right__content"></div>
+                    </div>
+                </div><a href="http://blog.legomushroom.com" id="js-tag" class="tag">
+                    <div class="tag__content"></div>
+                    <div class="tag__text">star.moon.sun</div>
+                </a>
+            </div>
+        </div>
+        <div id="js-scroll-suggest" class="scroll-suggest">
+            <div class="scroll-suggest__content"></div>
+        </div>
+        <div id="js-scroll-suggest-mask" class="scroll-suggest scroll-suggest--mask">
+            <div class="scroll-suggest__content"></div>
+        </div>
+    </section>
+
+
+
+
+
+</body>
+
+<script>
+    (function () {
+        var Main;
+
+        Main = (function () {
+            function Main() {
+                this.vars();
+                this.fixIETag();
+                this.initScroll();
+                this.describeSequence();
+                this.suggestScroll();
+            }
+
+            Main.prototype.vars = function () {
+                this.frameDur = 1500;
+                this.$cover = $('#js-cover');
+                this.$coverPlace = $('#js-cover-place');
+                this.$icon1 = $('#js-icon1 .box-icon__content');
+                this.$icon2 = $('#js-icon2 .box-icon__content');
+                this.$icon3 = $('#js-icon3 .box-icon__content');
+                this.$baseShadow = $('#js-base-shadow');
+                this.$bottomShadow = $('#js-bottom-shadow');
+                this.$leftPeel = $('#js-left-peel');
+                this.$leftPeelInner = $('#js-left-inner');
+                this.$leftPeelChildren = this.$leftPeel.children();
+                this.$rightPeel = $('#js-right-peel');
+                this.$rightPeelInner = $('#js-right-inner');
+                this.$rightPeelChildren = this.$rightPeel.children();
+                this.$line1 = $('#js-line1');
+                this.$line2 = $('#js-line2');
+                this.$tag = $('#js-tag');
+                this.$scrollSuggest = $('#js-scroll-suggest');
+                this.$scrollSuggestMask = $('#js-scroll-suggest-mask');
+                this.$curtain = $('#js-curtain');
+                return this.$w = $(window);
+            };
+
+            Main.prototype.hideCurtain = function () {
+                return this.$curtain.fadeOut(1000);
+            };
+
+            Main.prototype.suggestScroll = function () {
+                return this.scrollSuggestTween = TweenMax.to(this.$scrollSuggest, .5, {
+                    y: 10,
+                    repeat: -1,
+                    opacity: 1,
+                    yoyo: true,
+                    ease: Power2.easeIn
+                });
+            };
+
+            Main.prototype.stopScollSuggest = function () {
+                this.scrollSuggestTween.pause();
+                this.$scrollSuggest.hide();
+                return this.$scrollSuggestMask.hide();
+            };
+
+            Main.prototype.playScollSuggest = function () {
+                this.$scrollSuggest.show();
+                this.$scrollSuggestMask.show();
+                return this.scrollSuggestTween.play();
+            };
+
+            Main.prototype.describeSequence = function () {
+                var dur, start;
+                start = 1;
+                dur = this.frameDur;
+                this.line2Tween = TweenMax.to(this.$line2, 1, {
+                    left: -300,
+                    rotation: 15,
+                    onStart: (function (_this) {
+                        return function () {
+                            return _this.stopScollSuggest();
+                        };
+                    })(this),
+                    onReverseComplete: (function (_this) {
+                        return function () {
+                            return _this.playScollSuggest();
+                        };
+                    })(this)
+                });
+                this.controller.addTween(start, this.line2Tween, dur);
+                this.tagTween = TweenMax.to(this.$tag, 1, {
+                    rotation: 35
+                });
+                this.controller.addTween(start, this.tagTween, dur);
+                start += dur / 2.5;
+                dur = this.frameDur;
+                this.line1Tween = TweenMax.to(this.$line1, 1, {
+                    top: -300,
+                    rotation: 15
+                });
+                this.controller.addTween(start, this.line1Tween, dur);
+                start += dur - dur / 3;
+                dur = this.frameDur - this.frameDur / 4;
+                this.leftPeelTween = TweenMax.to(this.$leftPeel, 1, {
+                    left: '-50%'
+                });
+                this.controller.addTween(start, this.leftPeelTween, dur);
+                this.leftPeelChildrenTween = TweenMax.to(this.$leftPeelChildren, 1, {
+                    width: '100%'
+                });
+                this.controller.addTween(start, this.leftPeelChildrenTween, dur);
+                this.leftPeelTweenInner = TweenMax.to(this.$leftPeelInner, 1, {
+                    left: '100%',
+                    onStart: (function (_this) {
+                        return function () {
+                            if (!_this.isChromeFix()) {
+                                return;
+                            }
+                            return _this.$leftPeelInner.css({
+                                '-webkit-transform': 'translateX(1px)'
+                            });
+                        };
+                    })(this),
+                    onReverseComplete: (function (_this) {
+                        return function () {
+                            if (!_this.isChromeFix()) {
+                                return;
+                            }
+                            return _this.$leftPeelInner.css({
+                                '-webkit-transform': 'translateX(0px)'
+                            });
+                        };
+                    })(this)
+                });
+                this.controller.addTween(start, this.leftPeelTweenInner, dur);
+                this.rightPeelTween = TweenMax.to(this.$rightPeel, 1, {
+                    left: '100%'
+                });
+                this.controller.addTween(start, this.rightPeelTween, dur);
+                this.rightPeelChildrenTween = TweenMax.to(this.$rightPeelChildren, 1, {
+                    width: '100%'
+                });
+                this.controller.addTween(start, this.rightPeelChildrenTween, dur);
+                this.rightPeelTweenInner = TweenMax.to(this.$rightPeelInner, 1, {
+                    left: '-100%'
+                });
+                this.controller.addTween(start, this.rightPeelTweenInner, dur);
+                start += dur;
+                dur = this.frameDur;
+                this.coverBaseShadowTween = TweenMax.to(this.$baseShadow, 1, {
+                    opacity: 1
+                });
+                this.coverBottomShadowTween = TweenMax.to(this.$bottomShadow, 1, {
+                    opacity: .5
+                });
+                this.coverTween = TweenMax.to(this.$cover, 1, {
+                    rotationY: 120,
+                    rotationX: 65,
+                    x: this.$w.width() / 6.4,
+                    y: -400,
+                    onUpdate: (function (_this) {
+                        return function () {
+                            var progress;
+                            progress = _this.coverTween.progress();
+                            if (progress > .225) {
+                                _this.$icon1.css({
+                                    'z-index': 11
+                                });
+                            } else {
+                                _this.$icon1.css({
+                                    'z-index': 1
+                                });
+                            }
+                            if (progress > .265) {
+                                _this.$icon2.css({
+                                    'z-index': 11
+                                });
+                            } else {
+                                _this.$icon2.css({
+                                    'z-index': 1
+                                });
+                            }
+                            if (progress > .307) {
+                                return _this.$icon3.css({
+                                    'z-index': 11
+                                });
+                            } else {
+                                return _this.$icon3.css({
+                                    'z-index': 1
+                                });
+                            }
+                        };
+                    })(this)
+                });
+                this.controller.addTween(start, this.coverTween, dur);
+                this.controller.addTween(start, this.coverBaseShadowTween, dur / 2);
+                this.controller.addTween(start, this.coverBottomShadowTween, dur / 2);
+                return this.maxScroll = -(start + dur / 2);
+            };
+
+            Main.prototype.fixIETag = function () {
+                if (!this.isIE()) {
+                    return;
+                }
+                return $(document.body).addClass('ie');
+            };
+
+            Main.prototype.initScroll = function () {
+                var it;
+                this.scroller = new IScroll('#js-main', {
+                    probeType: 3,
+                    mouseWheel: true,
+                    deceleration: 0.001
+                });
+                document.addEventListener('touchmove', (function (e) {
+                    return e.preventDefault();
+                }), false);
+                this.controller = $.superscrollorama({
+                    triggerAtCenter: false,
+                    playoutAnimations: true
+                });
+                it = this;
+                this.scroller.on('scroll', function () {
+                    return it.updateScrollPos(this, it);
+                });
+                return this.scroller.on('scrollEnd', function () {
+                    return it.updateScrollPos(this, it);
+                });
+            };
+
+            Main.prototype.updateScrollPos = function (that, it) {
+                (that.y < it.maxScroll) && (that.y = it.maxScroll);
+                return it.controller.setScrollContainerOffset(0, -(that.y >> 0)).triggerCheckAnim(true);
+            };
+
+            Main.prototype.bind = function (func, context) {
+                var bindArgs, wrapper;
+                wrapper = function () {
+                    var args, unshiftArgs;
+                    args = Array.prototype.slice.call(arguments);
+                    unshiftArgs = bindArgs.concat(args);
+                    return func.apply(context, unshiftArgs);
+                };
+                bindArgs = Array.prototype.slice.call(arguments, 2);
+                return wrapper;
+            };
+
+            Main.prototype.isChromeFix = function () {
+                var ver, _ref;
+                ver = parseInt((_ref = window.navigator.appVersion.match(/Chrome\/(\d+)\./)) != null ? _ref[1] : void 0, 10);
+                return (ver > 33) && (navigator.userAgent.toLowerCase().indexOf('chrome') > -1);
+            };
+
+            Main.prototype.isFF = function () {
+                return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+            };
+
+            Main.prototype.isIE = function () {
+                var msie, rv, rvNum, trident, ua, undef;
+                if (this.isIECache) {
+                    return this.isIECache;
+                }
+                undef = void 0;
+                rv = -1;
+                ua = window.navigator.userAgent;
+                msie = ua.indexOf("MSIE ");
+                trident = ua.indexOf("Trident/");
+                if (msie > 0) {
+                    rv = parseInt(ua.substring(msie + 5, ua.indexOf(".", msie)), 10);
+                } else if (trident > 0) {
+                    rvNum = ua.indexOf("rv:");
+                    rv = parseInt(ua.substring(rvNum + 3, ua.indexOf(".", rvNum)), 10);
+                }
+                this.isIECache = (rv > -1 ? rv : undef);
+                return this.isIECache;
+            };
+
+            return Main;
+
+        })();
+
+        new Main;
+
+    }).call(this);
+
+    var oDiv = document.getElementById("js-cover-place");
+    oDiv.onclick = function () {
+        console.log("===========")
+        var duration = 15 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+        var interval = setInterval(function () {
+            var timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+            var particleCount = 50 * (timeLeft / duration);
+            // since particles fall down, start a bit higher than random
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+        }, 250);
+    }
+</script>
+
+<style>
+    /* blog post: http://blog.legomushroom.com/2014/04/paper-peel-effect/ */
+    * {
+        -moz-box-sizing: border-box;
+        box-sizing: border-box
+    }
+
+    body,
+    html {
+        min-width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden
+    }
+
+    body {
+        background: #efefef;
+        width: 100%;
+        height: 100%;
+        font-family: monospace
+    }
+
+    body,
+    section {
+        min-height: 100%
+    }
+
+    html {
+        height: 100%;
+        min-height: 100%
+    }
+
+
+    .curtain {
+        background: #fff;
+        position: absolute;
+        z-index: 50;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0
+    }
+
+    .scroll-suggest {
+        width: 25px;
+        position: absolute;
+        z-index: 40;
+        bottom: 8px;
+        left: 50%;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/scroll-suggest_1.svg) no-repeat center center;
+        background-size: 100% 100%;
+        opacity: .25;
+        -webkit-transform: translateY(-5px);
+        -ms-transform: translateY(-5px);
+        transform: translateY(-5px)
+    }
+
+    .scroll-suggest__content {
+        padding-bottom: 184.6153846%
+    }
+
+    .scroll-suggest--mask {
+        z-index: 20;
+        opacity: 1;
+        width: 64px;
+        height: 64px;
+        bottom: 0;
+        margin-left: -21px;
+        background: #00aeff
+    }
+
+    .thread-left {
+        width: 64px;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/thread1.svg) no-repeat center center;
+        background-size: 100% 100%
+    }
+
+    .thread-left__content {
+        padding-bottom: 100%
+    }
+
+    .thread-right {
+        width: 16px;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/thread2.svg) no-repeat center center;
+        background-size: 100% 100%
+    }
+
+    .thread-right__content {
+        padding-bottom: 316.6666667%
+    }
+
+    .tag {
+        width: 200px;
+        position: absolute;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/tag.svg) no-repeat center center;
+        background-size: 100% 100%;
+        display: block
+    }
+
+    .ie .tag {
+        background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/tag-ie.svg)
+    }
+
+    .tag__content {
+        padding-bottom: 180%
+    }
+
+    .tag__text {
+        position: absolute;
+        bottom: 32px;
+        width: 100%;
+        text-align: center;
+        font-size: 10px
+    }
+
+    .bow {
+        width: 480px;
+        position: absolute;
+        left: -200px;
+        top: 156px;
+        opacity: .98;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/bow.svg) no-repeat center center;
+        background-size: auto 100%
+    }
+
+    .bow__content {
+        padding-bottom: 58.7360595%
+    }
+
+    .bow .tag {
+        top: 168px;
+        left: 152px;
+        -webkit-transform: rotate(-20deg);
+        -ms-transform: rotate(-20deg);
+        transform: rotate(-20deg);
+        -webkit-transform-origin: center 64px;
+        -ms-transform-origin: center 64px;
+        transform-origin: center 64px;
+        z-index: 1
+    }
+
+    .bow .thread-left,
+    .bow .thread-right {
+        position: absolute;
+        top: 160px;
+        left: 193px;
+        z-index: 2
+    }
+
+    .bow .thread-right {
+        z-index: 0;
+        left: 261px;
+        top: 156px
+    }
+
+    .line-item {
+        background: rgba(252, 70, 173, .97);
+        position: absolute;
+        z-index: 30;
+        box-shadow: 2px 2px 3px rgba(0, 0, 0, .15)
+    }
+
+    .line-item:after,
+    .line-item:before {
+        content: '';
+        box-shadow: inherit;
+        background: inherit;
+        position: absolute;
+        width: inherit;
+        height: inherit
+    }
+
+    .line-item--vert {
+        left: 240px;
+        top: 0;
+        width: 75px;
+        height: 100%;
+        -webkit-transform-origin: center top;
+        -ms-transform-origin: center top;
+        transform-origin: center top
+    }
+
+    .line-item--vert:before {
+        top: -100%;
+        box-shadow: 2px -3px 3px rgba(0, 0, 0, .15)
+    }
+
+    .line-item--vert:after {
+        top: 100%
+    }
+
+    .line-item--hor {
+        width: 100%;
+        left: 0;
+        height: 75px;
+        top: 240px
+    }
+
+    .line-item--hor:before {
+        left: -100%;
+        box-shadow: 2px -3px 3px rgba(0, 0, 0, .15)
+    }
+
+    .line-item--hor:after {
+        left: 100%
+    }
+
+    .svg-icon--twitter {
+        fill: #00aeff
+    }
+
+    .svg-icon--dribbble {
+        fill: #fc46ad
+    }
+
+    .svg-icon--github {
+        fill: #4d4d4d
+    }
+
+    .box-icon {
+        width: 7.5%;
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -3.75%
+    }
+
+    .box-icon--one {
+        margin-left: -18.75%
+    }
+
+    .box-icon--two {
+        margin-left: -3.75%
+    }
+
+    .box-icon--three {
+        margin-left: 11.25%
+    }
+
+    .box-icon__content {
+        padding-bottom: 100%;
+        z-index: 1;
+        position: relative;
+        border-radius: 50%;
+        /* box-shadow: 2px 2px 2px rgba(0, 0, 0, .3) */
+    }
+
+    .box-icon__content:hover {
+        cursor: pointer
+    }
+
+    .box-icon__content:hover .svg-icon--twitter {
+        fill: #00a7f5
+    }
+
+    .box-icon__content:hover .svg-icon--dribbble {
+        fill: #fc2da2
+    }
+
+    .box-icon__content:hover .svg-icon--github {
+        fill: #404040
+    }
+
+    .box-icon__shadow {
+        content: '';
+        position: absolute;
+        z-index: 0;
+        top: 32%;
+        left: 35%;
+        height: 100%;
+        width: 200%;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/icon-gradient.svg) no-repeat left top;
+        background-size: 100% 100%;
+        -webkit-transform: rotate(20deg);
+        -ms-transform: rotate(20deg);
+        transform: rotate(20deg)
+    }
+
+    .box-icon svg {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: block
+    }
+
+    .box {
+        -webkit-transform-style: preserve3d;
+        -ms-transform-style: preserve3d;
+        transform-style: preserve3d;
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        bottom: 12px;
+        right: 12px;
+        -webkit-perspective: 1000px;
+        -ms-perspective: 1000px;
+        perspective: 1000px
+    }
+
+    .box__item {
+        position: absolute
+    }
+
+    .box__item:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/shadow-mask.png) no-repeat center center;
+        opacity: .12;
+        background-size: 100% 100%
+    }
+
+    .box__item--shadow {
+        height: 100%;
+        width: 100%;
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/box-shadow.png) no-repeat left center;
+        background-size: auto 100%;
+        box-shadow: none
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution:144dpi) {
+        .box__item--shadow {
+            background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/box-shadow@2x.png) no-repeat left center;
+            background-size: auto 100%
+        }
+    }
+
+    .box__item--shadow:after {
+        display: none
+    }
+
+    .box__item--base {
+        left: 12.95%;
+        right: 12.95%;
+        top: 12.95%;
+        bottom: 12.95%;
+        background: #e3e3e3;
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%, #dfdfdf), color-stop(100%, #ededed));
+        background: -webkit-linear-gradient(left, #dfdfdf 0, #ededed 100%);
+        background: linear-gradient(to right, #dfdfdf 0, #ededed 100%);
+        background-image:url("./cute-animal.png");
+        background-size: contain;
+    }
+
+    .box__item--base:after {
+        display: none
+    }
+
+    .box__item--left {
+        top: 0;
+        left: 0;
+        background: #fff;
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%, #fff), color-stop(100%, #e1e1e1));
+        background: -webkit-linear-gradient(left, #fff 0, #e1e1e1 100%);
+        background: linear-gradient(to right, #fff 0, #e1e1e1 100%)
+    }
+
+    .box__item--right {
+        top: 0;
+        right: 0;
+        background-image: -webkit-linear-gradient(0deg, #fff 0, #e8e8e8 100%);
+        background-image: -webkit-linear-gradient(180deg, #fff 0, #e8e8e8 100%);
+        background-image: linear-gradient(-90deg, #fff 0, #e8e8e8 100%)
+    }
+
+    .box__item--right:after {
+        opacity: .02
+    }
+
+    .box__item--left,
+    .box__item--right {
+        height: 100%;
+        width: 12.95%
+    }
+
+    .box__item--top {
+        -webkit-transform: rotateX(-75.5deg);
+        -ms-transform: rotateX(-75.5deg);
+        transform: rotateX(-75.5deg);
+        -webkit-transform-origin: 50% top;
+        -ms-transform-origin: 50% top;
+        transform-origin: 50% top;
+        top: 0;
+        left: 0;
+        background: #fff;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fff), color-stop(100%, #e1e1e1));
+        background: -webkit-linear-gradient(top, #fff 0, #e1e1e1 100%);
+        background: linear-gradient(to bottom, #fff 0, #e1e1e1 100%)
+    }
+
+    .box__item--top:after {
+        -webkit-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        transform: rotate(180deg);
+        opacity: .01
+    }
+
+    .box__item--bottom {
+        -webkit-transform: rotateX(75.5deg);
+        -ms-transform: rotateX(75.5deg);
+        transform: rotateX(75.5deg);
+        -webkit-transform-origin: 50% bottom;
+        -ms-transform-origin: 50% bottom;
+        transform-origin: 50% bottom;
+        bottom: 0;
+        left: 0;
+        background-image: -webkit-linear-gradient(90deg, #fff 0, #e1e1e1 100%);
+        background-image: linear-gradient(0deg, #fff 0, #e1e1e1 100%)
+    }
+
+    .box__item--bottom:after {
+        -webkit-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        transform: rotate(180deg);
+        opacity: .01
+    }
+
+    .box__item--bottom,
+    .box__item--top {
+        height: 360px;
+        width: 100%
+    }
+
+    .text {
+        fill: #fff;
+        font-size: 22px;
+        white-space: nowrap;
+        font-family: 'Open Sans';
+        text-transform: uppercase
+    }
+
+    .text--label {
+        font-size: 13px
+    }
+
+    .svg-container {
+        padding-bottom: 70.3125%;
+        position: relative
+    }
+
+    .svg-container__content {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden
+    }
+
+    .svg-container__content svg {
+        width: 100%;
+        height: 100%
+    }
+
+    .cover-place {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        -webkit-perspective: 600000px;
+        -ms-perspective: 600000px;
+        perspective: 600000px
+    }
+
+    .cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-transform: rotateY(0deg) rotateX(0deg) translateY(0px) translateZ(0px);
+        -ms-transform: rotateY(0deg) rotateX(0deg) translateY(0px) translateZ(0px);
+        transform: rotateY(0deg) rotateX(0deg) translateY(0px) translateZ(0px);
+        -webkit-transform-origin: right top;
+        -ms-transform-origin: right top;
+        transform-origin: right top;
+        -webkit-transform-style: preserve-3d;
+        -ms-transform-style: preserve-3d;
+        transform-style: preserve-3d
+    }
+
+    .cover__item {
+        position: absolute
+    }
+
+    .cover__item__shadow {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, .5);
+        opacity: 0
+    }
+
+    .cover__item:after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: #33beff url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/pattern.svg) repeat left center;
+        background: #f5e314 url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/pattern.svg) repeat left center;
+        background: #08d6bb url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/pattern.svg) repeat left center;
+        opacity: .75
+    }
+
+    .cover__item--base {
+        background: #fff;
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%, #fff), color-stop(100%, #e8e8e8));
+        background: -webkit-linear-gradient(left, #fff 0, #e8e8e8 100%);
+        background: linear-gradient(to right, #fff 0, #e8e8e8 100%);
+        width: 100%;
+        height: 100%
+    }
+
+    .cover__item--left {
+        left: 0;
+        -webkit-transform-origin: left center;
+        -ms-transform-origin: left center;
+        transform-origin: left center;
+        -webkit-transform: rotateY(90deg);
+        -ms-transform: rotateY(90deg);
+        transform: rotateY(90deg);
+        background-image: -webkit-linear-gradient(0deg, #fff 0, #e8e8e8 100%);
+        background-image: -webkit-linear-gradient(180deg, #fff 0, #e8e8e8 100%);
+        background-image: linear-gradient(-90deg, #fff 0, #e8e8e8 100%)
+    }
+
+    .cover__item--left:after {
+        background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/pattern2.svg)
+    }
+
+    .cover__item--left {
+        height: 100%;
+        width: 200px
+    }
+
+    .cover__item--bottom {
+        bottom: 0;
+        -webkit-transform-origin: center bottom;
+        -ms-transform-origin: center bottom;
+        transform-origin: center bottom;
+        -webkit-transform: rotateX(90deg);
+        -ms-transform: rotateX(90deg);
+        transform: rotateX(90deg);
+        background: #fff;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fff), color-stop(100%, #e1e1e1));
+        background: -webkit-linear-gradient(top, #fff 0, #e1e1e1 100%);
+        background: linear-gradient(to bottom, #fff 0, #e1e1e1 100%)
+    }
+
+    .cover__item--bottom:after {
+        -webkit-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        transform: rotate(180deg)
+    }
+
+    .cover__item--bottom .cover__item__shadow:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: .35;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, .65)));
+        background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0)0, rgba(0, 0, 0, .65)100%);
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0)0, rgba(0, 0, 0, .65)100%)
+    }
+
+    .cover__item--bottom {
+        width: 100%;
+        height: 200px
+    }
+
+    body {
+        background-position: 0 0
+    }
+
+    .peel-item {
+        height: 100%;
+        width: 50%;
+        top: 0;
+        position: absolute;
+        z-index: 20
+    }
+
+    .peel-item__gradient,
+    .peel-item__white {
+        background: #fff;
+        height: 100%;
+        position: absolute;
+        top: 0
+    }
+
+    .peel-item__bg {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        overflow: hidden
+    }
+
+    .peel-item__bg__inner {
+        background: #00aeff url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/dots-pattern_1.svg) left bottom;
+        -webkit-transform: translateZ(0);
+        -ms-transform: translateZ(0);
+        transform: translateZ(0);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0
+    }
+
+    .peel-item__gradient {
+        max-width: 80px
+    }
+
+    .peel-item--left {
+        left: 0
+    }
+
+    .peel-item--left .peel-item__gradient,
+    .peel-item--left .peel-item__white {
+        right: -1px
+    }
+
+    .peel-item--left .peel-item__bg__inner {
+        background-position: right bottom
+    }
+
+    .peel-item--left .peel-item__white {
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, .075), -8px -8px 24px rgba(0, 0, 0, .125)
+    }
+
+    .peel-item--left .peel-item__gradient {
+        background: #fff;
+        background: -webkit-gradient(linear, left top, right top, color-stop(2%, #fff), color-stop(71%, #e6e6e6), color-stop(100%, #eee));
+        background: -webkit-linear-gradient(left, #fff 2%, #e6e6e6 71%, #eee 100%);
+        background: linear-gradient(to right, #fff 2%, #e6e6e6 71%, #eee 100%)
+    }
+
+    .ie9 .peel-item--left .peel-item__gradient {
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/gradient-ie-fix-left.svg) no-repeat left top;
+        background-size: 100% 100%
+    }
+
+    .peel-item--right {
+        left: 50%
+    }
+
+    .peel-item--right .peel-item__gradient,
+    .peel-item--right .peel-item__white {
+        left: -1px
+    }
+
+    .peel-item--right .peel-item__white {
+        box-shadow: -2px 2px 8px rgba(0, 0, 0, .075), 8px -8px 24px rgba(0, 0, 0, .125)
+    }
+
+    .peel-item--right .peel-item__gradient {
+        background: #eee;
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%, #eee), color-stop(29%, #e6e6e6), color-stop(98%, #fff));
+        background: -webkit-linear-gradient(left, #eee 0, #e6e6e6 29%, #fff 98%);
+        background: linear-gradient(to right, #eee 0, #e6e6e6 29%, #fff 98%)
+    }
+
+    .ie9 .peel-item--right .peel-item__gradient {
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/6859/gradient-ie-fix.svg) no-repeat left top;
+        background-size: 100% 100%
+    }
+
+    .header-l {
+        background: c-red;
+        height: 80px;
+        padding: 12px 16px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%
+    }
+
+    .header-l .main-logo-b {
+        color: c-bg;
+        margin-top: -4px
+    }
+
+    .header-l .round-icon-b {
+        float: right
+    }
+
+    .header-l .round-icon-b+.round-icon-b {
+        margin-right: 16px
+    }
+
+    .side-icons-l {
+        display: inline-block
+    }
+
+    .side-icons-l .timer-b {
+        margin-bottom: 32px
+    }
+
+    .side-icons-l .icon {
+        margin: 0 auto
+    }
+
+    .side-icons-l .icon+.icon {
+        margin-top: 16px
+    }
+
+    .recipes-l .recipe-b+.recipe-b:after {
+        content: '';
+        width: 100%;
+        height: 16px;
+        top: -8px;
+        position: absolute;
+        background-image: -webkit-repeating-radial-gradient(center center, c-red, c-red 1px, transparent 1px, transparent 100%);
+        background-image: repeating-radial-gradient(center center, c-red, c-red 1px, transparent 1px, transparent 100%);
+        background-size: 8px 8px
+    }
+
+    .icon {
+        width: 32px;
+        height: 32px;
+        fill: c-red;
+        display: block;
+        position: relative
+    }
+
+    .icon:after {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0
+    }
+
+    .icon svg {
+        float: left;
+        width: 100%;
+        height: 100%
+    }
+
+    .icon.is-hoverable:hover {
+        fill: c-red-hover;
+        cursor: pointer
+    }
+
+    a {
+        color: #333;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    .txt {
+
+        /* font-family: "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif; */
+        @font-face {
+            font-family: 'mountains_of_christmasregular';
+            src: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/35984/mountainsofchristmas-webfont.woff2') format('woff2'),
+                url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/35984/mountainsofchristmas-webfont.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+
+        }
+        width: 100%;
+        height: 100%;
+        margin-top: 220px;
+        text-align: center;
+        color: #FB4570;
+        font-size: 50px;
+    }
+</style>
