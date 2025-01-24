@@ -217,8 +217,102 @@ export default {
       ctx.restore();
     };
 
+    const drawMeteorRain = () => {
+      const canvas = backgroundCanvas.value;
+      const ctx = canvas.getContext("2d");
+
+      let meteors = Array.from({ length: 7 }).map(() => ({
+        x: Math.random() * (canvas.width / 3), // 限制 x 在左上角区域
+        y: 0, // 限制 y 在左上角区域
+        length: Math.random() * 150 + 50, // 流星的长度
+        speed: Math.random() * 3 + 1, // 流星的速度
+      }));
+
+      const angle = Math.PI / 4; // 固定的倾斜角度 (45 度)
+      const trailOpacity = 0.1; // 拖影的透明度
+
+      const drawStar = (
+        ctx,
+        cx,
+        cy,
+        spikes,
+        outerRadius,
+        innerRadius,
+        color
+      ) => {
+        let rot = (Math.PI / 2) * 3; // 初始旋转角度
+        let x = cx;
+        let y = cy;
+        const step = Math.PI / spikes; // 每个尖角的角度
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius); // 起点
+        for (let i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          ctx.lineTo(x, y);
+          rot += step;
+        }
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+      };
+
+      const animateMeteor = () => {
+        ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        meteors.forEach((meteor) => {
+          const xEnd = meteor.x - meteor.length * Math.cos(angle);
+          const yEnd = meteor.y - meteor.length * Math.sin(angle);
+
+          // 绘制流星头部
+          drawStar(ctx, meteor.x, meteor.y, 5, 10, 5, "rgba(255, 255, 255, 1)");
+
+          // 绘制流星拖影
+          const trailGradient = ctx.createLinearGradient(
+            meteor.x,
+            meteor.y,
+            xEnd,
+            yEnd
+          );
+          trailGradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+          trailGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+          ctx.beginPath();
+          ctx.moveTo(meteor.x, meteor.y);
+          ctx.lineTo(xEnd, yEnd);
+          ctx.strokeStyle = trailGradient;
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // 更新流星位置
+          meteor.x += meteor.speed * Math.cos(angle);
+          meteor.y += meteor.speed * Math.sin(angle);
+
+          // 如果流星超出屏幕，重新生成
+          if (meteor.x > canvas.width || meteor.y > canvas.height) {
+            meteor.x = Math.random() * canvas.width;
+            meteor.y = Math.random() * canvas.height * 0.5;
+            meteor.length = Math.random() * 150 + 50;
+            meteor.speed = Math.random() * 3 + 1;
+          }
+        });
+
+        requestAnimationFrame(animateMeteor);
+      };
+
+      animateMeteor();
+    };
+
     onMounted(() => {
       drawBackground();
+      drawMeteorRain(); // 启动流星动画
       window.addEventListener("resize", drawBackground);
     });
 
@@ -284,11 +378,16 @@ export default {
   font-family: "Roboto", sans-serif; /* 使用 Google 字体 */
   margin-top: 10px;
   font-size: 36px;
-  color: #d23271;
-  /* color: #CD4178; */
+   /* color: #d23271; */
+  color: #ffffff;
   white-space: nowrap;
   z-index: 7;
   /* animation: blink 1.5s infinite;  */
+}
+
+.typing-container span {
+  opacity: 0;
+  animation: fadeIn 0.3s forwards, glow 1.5s infinite alternate;
 }
 
 /* .typing-container span {
