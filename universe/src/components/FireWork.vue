@@ -31,14 +31,22 @@ export default {
     const fireworkCanvas = ref(null);
     const typedText = ref(""); // 打字机效果的文字
     const typingContainer = ref(null); // 引用文本容器
-    const fullText = "n 55!W !"; // 完整的文本
 
-    const typeWriter = (text, index = 0) => {
+    // const typeWriter = (text, index = 0) => {
+    //   if (index < text.length) {
+    //     typedText.value += text[index]; // 每次增加一个字符
+    //     setTimeout(() => typeWriter(text, index + 1), 300); // 控制打字速度
+    //   }
+    // };
+    const typeWriter = (text, index = 0, callback = null) => {
       if (index < text.length) {
         typedText.value += text[index]; // 每次增加一个字符
-        setTimeout(() => typeWriter(text, index + 1), 300); // 控制打字速度
+        setTimeout(() => typeWriter(text, index + 1, callback), 300); // 控制打字速度
+      } else if (callback) {
+        setTimeout(callback, 5000); // 完成后 5 秒调用回调
       }
     };
+
     // 打字机函数：打印单列内容
     // 打字机函数：逐个字从上到下打印
     const typeWriter2 = (text, columnRef, index = 0, callback = null) => {
@@ -49,7 +57,7 @@ export default {
         span.classList.add("glowing-text"); // 添加光晕效果类
         setTimeout(
           () => typeWriter2(text, columnRef, index + 1, callback),
-          300
+          500
         ); // 控制打字速度
       } else if (callback) {
         callback(); // 打印完成后执行回调
@@ -66,8 +74,13 @@ export default {
     ];
 
     // 打字机函数：打印单列内容
-
+    let isFireworkTriggered = false;
     const triggerFirework = () => {
+      if (isFireworkTriggered) {
+        return; // 如果已经触发过，直接返回，防止重复调用
+      }
+
+      isFireworkTriggered = true; // 第一次调用时设置为 true
       const firework = new Fireworks(fireworkCanvas.value, {
         x: window.innerWidth / 2,
         y: window.innerHeight - 50,
@@ -117,12 +130,44 @@ export default {
           // 打印右侧列内容
           typeWriter2(textColumns[1], column2, 0, () => {
             // 右侧列打印完成后打印左侧列
-            typeWriter2(textColumns[0], column1);
+            typeWriter2(textColumns[0], column1, 0, () => {
+              // 左侧列打印完成后开始打印 typedText
+              printTypedText();
+            });
           }),
-        7000
+        5000
       ); // 打印第一列
 
-      setTimeout(() => typeWriter(fullText), 11000);
+      // 每隔7秒更改 typedText
+      let counter = 0;
+
+      const messages = ["Happy New Year", "n 55!W !", "Good Night", "Good Bye"];
+      // 定义打印 typedText 的函数
+const printTypedText = () => {
+  // 打印初始内容
+  typeWriter(messages[counter]);
+
+  // 每隔 7 秒打印下一条消息
+  const intervalId = setInterval(() => {
+    counter = (counter + 1) % messages.length; // 更新消息索引
+    typedText.value = ""; // 清空内容
+    typeWriter(messages[counter]); // 打印新的内容
+  }, 7000);
+
+  // 设置定时器，30 秒后停止更新
+  setTimeout(() => clearInterval(intervalId), 30000);
+};
+      // const intervalId = setInterval(() => {
+      //   // 更新 typedText 和打印新内容
+      //   typedText.value = "";
+      //   typeWriter(messages[counter]);
+
+      //   // 更新 counter 来选择下一个消息
+      //   counter = (counter + 1) % messages.length;
+      // }, 7000);
+
+      // // 停止定时器（根据需求，你可以在某个时机停止，比如手动取消）
+      // setTimeout(() => clearInterval(intervalId), 30000); // 30秒后停止定时器
     };
 
     const drawBackground = () => {
@@ -225,7 +270,7 @@ export default {
         x: Math.random() * (canvas.width / 3), // 限制 x 在左上角区域
         y: 0, // 限制 y 在左上角区域
         length: Math.random() * 150 + 50, // 流星的长度
-        speed: Math.random() * 3 + 1, // 流星的速度
+        speed: Math.random() * 3 + 2, // 流星的速度
       }));
 
       const angle = Math.PI / 4; // 固定的倾斜角度 (45 度)
@@ -377,8 +422,8 @@ export default {
   position: absolute;
   font-family: "Roboto", sans-serif; /* 使用 Google 字体 */
   margin-top: 10px;
-  font-size: 36px;
-   /* color: #d23271; */
+  font-size: 29px;
+  /* color: #d23271; */
   color: #ffffff;
   white-space: nowrap;
   z-index: 7;
