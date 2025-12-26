@@ -15,7 +15,7 @@ const SNOW_SPEED_MIN = 0.4;
 const SNOW_SPEED_MAX = 1.6;     
 const SNOW_OPACITY = 0.3;       
 const TEXT_OPACITY = 0.95;      // 略微提升亮度
-const MORPH_SPEED = 0.1;        // 加快聚合速度，让文字更稳
+const MORPH_SPEED = 0.01;        // 加快聚合速度，让文字更稳
 const FADE_SPEED = 0.04;        
 
 const TEXT_Y_OFFSET = -0.22;    
